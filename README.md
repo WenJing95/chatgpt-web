@@ -18,11 +18,11 @@
 		- [Node](#Node)
 		- [Python](#Python)
 	- [开发环境启动项目](#开发环境启动项目)
-		- [后端](#后端服务)
-		- [前端](#前端网页)
+		- [启动前端服务](#启动前端服务)
+		- [启动后端服务](#启动后端服务)
 	- [打包和部署](#打包和部署)
-		- [前端打包](#前端资源打包(需要安装node和docker、docker-compose))
-		- [后端打包](#后端服务打包)
+		- [前端打包](#前端资源打包(需要安装node))
+		- [后端打包](#后端服务打包为docker容器(需要安装docker和docker-compose))
 	- [使用DockerCompose启动](#使用DockerCompose启动)
 	- [常见问题](#常见问题)
 	- [参与贡献](#参与贡献)
@@ -31,17 +31,16 @@
 
 ## 介绍
 
-这是一个可以自己在本地部署的`ChatGpt`网页，使用`OpenAI`的官方API接入`gpt-3.5-turbo`或`gpt-4`模型来实现接近`ChatGPT Plus`的对话效果。
+这是一个可以私有化部署的`ChatGpt`网页，使用`OpenAI`的官方API接入`gpt-3.5-turbo`或`gpt-4`模型来实现接近`ChatGPT Plus`的对话效果。
 源代码Fork和修改于[Chanzhaoyu/chatgpt-web](https://github.com/Chanzhaoyu/chatgpt-web/)
 
-与OpenAI官方提供的付费版本`ChatGPT Plus`对比，`ChatGPT Web`有以下优势：
+与OpenAI官方提供`ChatGPT Plus`对比，`ChatGPT Web`有以下优势：
 
-1. **省钱(仅限`gpt-3.5-turbo`)**。你可以用1折左右的价格，体验与`ChatGPT Plus`
-	 几乎相同的对话服务。对于日常学习工作使用，你不必每月花费20$购买Plus服务，使用本项目自己对接API的使用成本，是`ChatGPT Plus`
-	 的1/10左右。
+1. **省钱(仅限`gpt-3.5-turbo`)**。
+  - 按照日常用量，你可以用1折左右的价格，体验与`ChatGPT Plus`几乎相同的对话服务。
+  - 语音识别可以在本地离线完成，完全免费。
 2. **0门槛使用**。你可以将自建的`ChatGPT Web`
-	 站点分享给家人和朋友，他们不再需要经历“解决网络问题”-“登录”-“输入密码”-“点选验证码”这一连串麻烦的环节，就可以轻松享受到`ChatGPT Plus`
-	 带来的生产力提升。
+	 站点分享给家人和朋友，他们不再需要解决网络问题，就可以轻松享受到`ChatGPT Plus`带来的生产力提升。
 3. **可以缓解网络封锁的影响**。`ChatGPT Web`只需要一个`OpenAI API Key`即可使用，如果你所在的地区无法访问`OpenAI`
 	 ，你可以将`ChatGPT Web`部署在海外服务器上，或在当地服务器上配置`socks_proxy`参数来转发请求给代理软件，即可正常使用。
 
@@ -50,12 +49,12 @@
 1. 专注于易用、易部署、不操心，我将尽我所能做到对小白用户友好，因此本项目也会舍弃一些专业功能，例如：
 
 	 - 不支持accessToken这类非官方使用方式。我认为你只是希望有个稳定能用的AI助手，并不想折腾这些
-	 - 不支持反向代理。因为很多用户喜欢使用第三方给的反代地址，但是它们的安全性存疑、封号也超级快！
+	 - 不支持反向代理。第三方的反代地址安全性存疑、封号也超级快！
    - 不做导入和管理Prompt模板的功能。使用者没有“这个链接干什么用的”、“什么是json文件”、“为什么要我自己审核json文件的安全性，怎么审核？”此类烦恼
 
-2. 可以识别语音消息：通过接入`whisper-1`API实现。懒得打字的时候很好用
-3. 可以微调参数：通过设置可以调整`ChatGpt`的性格
-4. 可以“记住”更多的上下文：聊天记录保存在服务器端，不会因为网页端清理缓存而丢失上下文，影响回答质量
+2. 可以识别语音消息：通过OpenAI官方`whisper-1`接口，或免费的`whisper.cpp`实现。懒得打字的时候很好用
+3. 可以调整`ChatGpt`的性格
+4. 可以调整记住的上下文数量
 
 其它区别：
 1. 增加日语界面
@@ -91,6 +90,21 @@ npm install pnpm -g
 pip install --no-cache-dir -r requirements.txt
 ```
 
+### whisper.cpp编译
+这一步的目的是设置本地语音识别功能，这个模块来自[ggerganov/whisper](https://github.com/ggerganov/whisper.cpp)
+
+如果你的系统是windows，可以跳过这一步，因为whisper的二进制文件，我已经为你下载好，放在项目里了；
+
+如果你的系统是linux，则需要你自己编译whisper：
+
+```shell
+cd ./tools/local-whisper/linux/
+chmod +x init.sh
+./init.sh
+```
+
+`init.sh`脚本执行完成之后，你将看到`./tools/local-whisper/linux/whisper.cpp-master/`目录，目录中有个叫`main`的二进制文件，这就是你需要的`whisper`。
+
 ## 开发环境启动项目
 
 ### 启动前端服务
@@ -116,14 +130,15 @@ python main.py --openai_api_key="$OPENAI_API_KEY"
 除了`openai_api_key`这个必填的参数之外，还有以下可选参数可用：
 
 - `openai_timeout_ms` 访问OpenAI的超时时间(毫秒)，默认值为 '100000'
-- `api_model` 默认值为 gpt-3.5-turbo 也可以使用很贵的 gpt-4
+- `api_model` 默认值为 gpt-3.5-turbo-0301 也可以使用很贵的 gpt-4
 - `socks_proxy` 代理，默认值为空字符串，格式示例: `http://127.0.0.1:10808`
+- `use_local_whisper` 设置为`true`可以使用离线模型来完成语音识别，如果设置为`false`就会使用OpenAI的API进行语音识别，默认值为: `true`
 - `host` HOST，默认值为 0.0.0.0
 - `port` PORT，默认值为 3002
 
 也就是说你也可以这样启动
 ```shell
-python main.py --openai_api_key="$OPENAI_API_KEY" --openai_timeout_ms="$OPENAI_TIMEOUT_MS" --api_model="$API_MODEL" --socks_proxy="$SOCKS_PROXY" --host="$HOST" --port="$PORT"
+python main.py --openai_api_key="$OPENAI_API_KEY" --openai_timeout_ms="$OPENAI_TIMEOUT_MS" --api_model="$API_MODEL" --socks_proxy="$SOCKS_PROXY" --use_local_whisper="$USE_LOCAL_WHISPER" --host="$HOST" --port="$PORT"
 ```
 
 
@@ -173,10 +188,14 @@ python main.py --openai_api_key="$OPENAI_API_KEY" --openai_timeout_ms="$OPENAI_T
         OPENAI_API_KEY: your_openai_api_key
         # 访问OpenAI的超时时间(毫秒)，可选，默认值为 '100000'
         OPENAI_TIMEOUT_MS: '100000'
-        # 可选，默认值为 gpt-3.5-turbo
-        API_MODEL: gpt-3.5-turbo
+        # 可选，默认值为 gpt-3.5-turbo-0301
+        API_MODEL: gpt-3.5-turbo-0301
         # Socks代理，可选，格式为 http://127.0.0.1:10808
         SOCKS_PROXY: ''
+        # 可选，将USE_LOCAL_WHISPER设置为`true`可以使用离线模型来完成语音识别，如果设置为`false`就会使用OpenAI的API进行语音识别，默认值为: `true`
+ 				# 使用离线模型就不需要向OpenAI付费，但会额外消耗一些服务器的cpu和内存资源，这里使用的是tiny模型，工作时占用的内存大概是125MB左右
+ 				# 具体性能消耗参考whisper.cpp的官方文档： https://github.com/ggerganov/whisper.cpp#memory-usage
+        USE_LOCAL_WHISPER: 'true'
         # HOST，可选，默认值为 0.0.0.0
         HOST: 0.0.0.0
         # PORT，可选，默认值为 3002
@@ -249,10 +268,14 @@ python main.py --openai_api_key="$OPENAI_API_KEY" --openai_timeout_ms="$OPENAI_T
         OPENAI_API_KEY: your_openai_api_key
         # 访问OpenAI的超时时间(毫秒)，可选，默认值为 '100000'
         OPENAI_TIMEOUT_MS: '100000'
-        # 可选，默认值为 gpt-3.5-turbo
-        API_MODEL: gpt-3.5-turbo
+        # 可选，默认值为 gpt-3.5-turbo-0301
+        API_MODEL: gpt-3.5-turbo-0301
         # Socks代理，可选，格式为 http://127.0.0.1:10808
         SOCKS_PROXY: ''
+        # 可选，将USE_LOCAL_WHISPER设置为`true`可以使用离线模型来完成语音识别，如果设置为`false`就会使用OpenAI的API进行语音识别，默认值为: `true`
+ 				# 使用离线模型就不需要向OpenAI付费，但会额外消耗一些服务器的cpu和内存资源，这里使用的是tiny模型，工作时占用的内存大概是125MB左右
+ 				# 具体性能消耗参考whisper.cpp的官方文档： https://github.com/ggerganov/whisper.cpp#memory-usage
+				USE_LOCAL_WHISPER: 'true'
         # HOST，可选，默认值为 0.0.0.0
         HOST: 0.0.0.0
         # PORT，可选，默认值为 3002

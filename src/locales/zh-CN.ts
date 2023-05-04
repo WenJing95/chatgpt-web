@@ -71,6 +71,7 @@ export default {
     SomethingWrongInOpenaiGptApi: '访问OpenAI GPT API出错，请稍后再试',
     SomethingWrongInOpenaiModerationApi: '访问OpenAI Moderation API出错，请稍后再试',
     SomethingWrongInOpenaiWhisperApi: '访问OpenAI Whisper API出错，请稍后再试',
+    SomethingWrongInLocalWhisper: '访问本地Whisper API出错，请联系开发者获取更多帮助',
   },
 
 }

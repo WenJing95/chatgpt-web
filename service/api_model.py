@@ -1,9 +1,9 @@
 class ApiModel:
-    KNOWN_API_MODEL_NAMES = ["gpt-3.5-turbo",
+    KNOWN_API_MODEL_NAMES = ["gpt-3.5-turbo-0301",
                              "gpt-4",
                              # "gpt-4-32k"
                              ]
-    KNOWN_API_MODEL_MAX_TOKENS = {"gpt-3.5-turbo": 4096,
+    KNOWN_API_MODEL_MAX_TOKENS = {"gpt-3.5-turbo-0301": 4096,
                                   "gpt-4": 8000,
                                   # "gpt-4-32k": 32000
                                   }

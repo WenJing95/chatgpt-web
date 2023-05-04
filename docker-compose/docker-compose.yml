@@ -11,10 +11,14 @@ services:
       OPENAI_API_KEY: ''
       # 访问OpenAI的超时时间，可选，默认值为 '100000'
       OPENAI_TIMEOUT_MS: '100000'
-      # 可选，默认值为 gpt-3.5-turbo
-      API_MODEL: gpt-3.5-turbo
+      # 可选，默认值为 gpt-3.5-turbo-0301
+      API_MODEL: gpt-3.5-turbo-0301
       # Socks代理，可选，格式为 http://127.0.0.1:10808
       SOCKS_PROXY: ''
+      # 可选，将USE_LOCAL_WHISPER设置为`true`可以使用离线模型来完成语音识别，如果设置为`false`就会使用OpenAI的API进行语音识别，默认值为: `true`
+      # 使用离线模型就不需要向OpenAI付费，但会额外消耗一些服务器的cpu和内存资源，这里使用的是tiny模型，工作时占用的内存大概是125MB左右
+      # 具体性能消耗参考whisper.cpp的官方文档： https://github.com/ggerganov/whisper.cpp#memory-usage
+      USE_LOCAL_WHISPER: 'true'
       # HOST，可选，默认值为 0.0.0.0
       HOST: 0.0.0.0
       # PORT，可选，默认值为 3002

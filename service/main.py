@@ -7,9 +7,11 @@ from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import JSONResponse, StreamingResponse
 import uvicorn
 from message_store import MessageStore
-from whisper_wapper import process_audio
+from whisper_wapper import process_audio_local, process_audio_api
 import argparse
 from api_model import ApiModel
+import platform
+from pathlib import Path
 
 log_folder = os.path.join(abspath(dirname(__file__)), "log")
 logger.add(os.path.join(log_folder, "{time}.log"), level="INFO")
@@ -19,6 +21,16 @@ MIN_TIMEOUT_MS = 15000
 DEFAULT_DB_SIZE = 100000
 DEFAULT_API_MODEL = "gpt-3.5-turbo"
 DEFAULT_MAX_TOKEN = 4096
+CURRENT_OS = platform.system()
+USE_LOCAL_WHISPER = True
+
+current_file_path = Path(__file__).resolve()
+base_directory = current_file_path.parent
+
+AUDIO_TMP_PATH = base_directory / "audio_tmp"
+LOCAL_WHISPER_MODEL_PATH = base_directory / "tools" / "local-whisper" / "model" / "ggml-tiny.bin"
+LOCAL_WHISPER_BIN_PATH_LINUX = base_directory / "tools" / "local-whisper" / "linux" / "whisper.cpp-master" / "main"
+LOCAL_WHISPER_BIN_PATH_WINDOWS = base_directory / "tools" / "local-whisper" / "windows" / "main.exe"
 
 massage_store = MessageStore(db_path="message_store.json", table_name="chatgpt", max_size=DEFAULT_DB_SIZE)
 
@@ -58,7 +70,7 @@ async def chat_process(request_data: dict):
     if 1 == request_data["top_p"]:
         top_p = 0.2
     elif 50 == request_data["top_p"]:
-        top_p = 0.5
+        top_p = 0.6
     else:
         top_p = 1
 
@@ -69,7 +81,17 @@ async def chat_process(request_data: dict):
 
 @app.post("/audio-chat-process")
 async def audio_chat_process(audio: UploadFile = File(...)):
-    prompt = process_audio(audio, OPENAI_TIMEOUT, "whisper-1")
+    if USE_LOCAL_WHISPER:
+        local_whisper_bin_path = LOCAL_WHISPER_BIN_PATH_LINUX if "Linux" == CURRENT_OS else LOCAL_WHISPER_BIN_PATH_WINDOWS
+
+        prompt = process_audio_local(audio,
+                                     audio_tmp_path=AUDIO_TMP_PATH,
+                                     model_path=LOCAL_WHISPER_MODEL_PATH,
+                                     local_whisper_bin_path=local_whisper_bin_path)
+    else:
+        prompt = process_audio_api(audio,
+                                   timeout=OPENAI_TIMEOUT)
+
     return StreamingResponse(content=prompt, headers=stream_response_headers, media_type="text/event-stream")
 
 
@@ -85,10 +107,12 @@ def init_config():
                         help="(Deprecate) Timeout for OpenAI API, default is '100000'")
     parser.add_argument('--openai_timeout_ms', type=str, default=DEFAULT_TIMEOUT_MS_STRING,
                         help="Timeout for OpenAI API, default is '100000'")
-    # parser.add_argument('--service_timeout_ms', type=str, default=DEFAULT_TIMEOUT_MS_STRING,
-    #                     help="Timeout for backend service, default is '100000'")
+    parser.add_argument('--use_local_whisper', type=str, default='True',
+                        help="Use local whisper or api whisper. local whisper is free, api whisper is best,"
+                             " default is 'True'")
     parser.add_argument('--host', type=str, default="0.0.0.0", help='Host for server, default is 0.0.0.0')
     parser.add_argument('--port', type=str, default="3002", help="Port for server, default is '3002'")
+
     args = parser.parse_args()
 
     if not args.openai_api_key:
@@ -171,11 +195,16 @@ def init_config():
             logger.error(err)
             raise TypeError(err)
 
-    return massage_store, openai_api_key, host, port, api_model, max_token, socks_proxy, openai_timeout
+    use_local_whisper = True if args.use_local_whisper in ['True', 'true'] else False
+
+    AUDIO_TMP_PATH.mkdir(parents=True, exist_ok=True)
+
+    return massage_store, openai_api_key, host, port, api_model, \
+           max_token, socks_proxy, openai_timeout, use_local_whisper
 
 
 if __name__ == "__main__":
-    MASSAGE_STORE, OPENAI_API_KEY, HOST, PORT, API_MODEL, MAX_TOKEN, SOCKS_PROXY, OPENAI_TIMEOUT = init_config()
+    MASSAGE_STORE, OPENAI_API_KEY, HOST, PORT, API_MODEL, MAX_TOKEN, SOCKS_PROXY, OPENAI_TIMEOUT, USE_LOCAL_WHISPER = init_config()
     logger.info("OPENAI_API_KEY:{}".format(OPENAI_API_KEY))
     logger.info("HOST:{}".format(HOST))
     logger.info("PORT:{}".format(PORT))
@@ -183,6 +212,8 @@ if __name__ == "__main__":
     logger.info("MAX_TOKEN:{}".format(MAX_TOKEN))
     logger.info("SOCKS_PROXY:{}".format(SOCKS_PROXY))
     logger.info("OPENAI_TIMEOUT_MS:{}".format(OPENAI_TIMEOUT * 1000))
-    # logger.info("SERVICE_TIMEOUT_MS:{}".format(SERVICE_TIMEOUT * 1000))
+    logger.info("USE_LOCAL_WHISPER:{}".format(USE_LOCAL_WHISPER))
+
+    logger.info("AUDIO_TMP_PATH:{}".format(AUDIO_TMP_PATH))
 
     uvicorn.run(app, host=HOST, port=PORT)

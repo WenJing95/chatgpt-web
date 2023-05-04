@@ -71,5 +71,6 @@ export default {
     SomethingWrongInOpenaiGptApi: '申し訳ありませんが、OpenAI GPT APIへのアクセス中に問題が発生しました。後でもう一度お試しください。',
     SomethingWrongInOpenaiModerationApi: '申し訳ありませんが、OpenAI Moderation APIへのアクセス中に問題が発生しました。後でもう一度お試しください。',
     SomethingWrongInOpenaiWhisperApi: '申し訳ありませんが、OpenAI Whisper APIへのアクセス中に問題が発生しました。後でもう一度お試しください。',
+    SomethingWrongInLocalWhisper: '申し訳ありませんが、Local Whisper APIへのアクセス中に問題が発生しました。開発者に連絡してさらなるサポートを求めてください。',
   },
 }

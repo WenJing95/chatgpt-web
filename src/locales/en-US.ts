@@ -71,6 +71,7 @@ export default {
     SomethingWrongInOpenaiGptApi: 'Oops, something went wrong in OpenAI GPT API. Please try again later.',
     SomethingWrongInOpenaiModerationApi: 'Oops, something went wrong in OpenAI Moderation API. Please try again later.',
     SomethingWrongInOpenaiWhisperApi: 'Oops, something went wrong in OpenAI Whisper API. Please try again later.',
+    SomethingWrongInLocalWhisper: 'Oops, something went wrong in local Whisper API. Please contact the developer for further assistance.',
   },
 
 }

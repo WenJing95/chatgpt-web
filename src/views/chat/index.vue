@@ -3,7 +3,7 @@ import type { Ref } from 'vue'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { NButton, NInput, useDialog } from 'naive-ui'
-import Recorder from 'recorder-core/recorder.mp3.min'
+import Recorder from 'recorder-core/recorder.wav.min'
 import { Message } from './components'
 import { useScroll } from './hooks/useScroll'
 import { useChat } from './hooks/useChat'
@@ -53,10 +53,7 @@ dataSources.value.forEach((item, index) => {
 })
 
 function isServerError(responseText: string) {
-  if (responseText.startsWith('ChatGptWebServerError:'))
-    return true
-
-  return false
+  return responseText.startsWith('ChatGptWebServerError:')
 }
 function getServerErrorType(responseText: string) {
   if (responseText.startsWith('ChatGptWebServerError:'))
@@ -72,7 +69,7 @@ function handleSubmit() {
 let rec = new Recorder()
 const recOpen = function (success: Function) {
   rec = Recorder({
-    type: 'mp3',
+    type: 'wav',
     sampleRate: 16000,
     bitRate: 16,
     onProcess() {
@@ -152,7 +149,7 @@ async function recStop() {
       options = { ...lastContext }
 
     const formData = new FormData()
-    formData.append('audio', blob, 'recording.mp3')
+    formData.append('audio', blob, 'recording.wav')
 
     try {
       await fetchAudioChatAPIProcess<Chat.ConversationResponse>({

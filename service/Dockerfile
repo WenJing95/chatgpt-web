@@ -11,6 +11,15 @@ COPY . .
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 ENV PATH="/root/.cargo/bin:$PATH"
 
+# 编译whisper
+WORKDIR ./tools/local-whisper/linux/
+RUN chmod +x init.sh
+RUN ./init.sh
+WORKDIR /app
+
+# 下载whisper使用的模型
+#wget -P ./tools/local-whisper/model https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.bin
+
 # 安装依赖
 RUN pip install --upgrade pip && pip install --upgrade --no-cache-dir -r requirements.txt
 
@@ -19,6 +28,7 @@ ENV OPENAI_API_KEY=""
 ENV OPENAI_TIMEOUT_MS="100000"
 ENV API_MODEL="gpt-3.5-turbo"
 ENV SOCKS_PROXY=""
+ENV USE_LOCAL_WHISPER: 'true'
 ENV HOST="127.0.0.1"
 ENV PORT=3002
 
