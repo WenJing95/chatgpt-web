@@ -290,6 +290,7 @@ python main.py --openai_api_key="$OPENAI_API_KEY" --openai_timeout_ms="$OPENAI_T
         - '80'
       volumes:
         - ./nginx/html/:/etc/nginx/html/
+        - ./nginx/auth/:/etc/nginx/auth/
         - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
       links:
         - app
