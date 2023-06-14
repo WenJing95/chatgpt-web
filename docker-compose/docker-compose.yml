@@ -11,8 +11,8 @@ services:
       OPENAI_API_KEY: ''
       # 访问OpenAI的超时时间，可选，默认值为 '100000'
       OPENAI_TIMEOUT_MS: '100000'
-      # 可选，默认值为 gpt-3.5-turbo-0301
-      API_MODEL: gpt-3.5-turbo-0301
+      # 可选，默认值为 gpt-3.5-turbo
+      API_MODEL: gpt-3.5-turbo
       # Socks代理，可选，格式为 http://127.0.0.1:10808
       SOCKS_PROXY: ''
       # 可选，将USE_LOCAL_WHISPER设置为`true`可以使用离线模型来完成语音识别，如果设置为`false`就会使用OpenAI的API进行语音识别，默认值为: `true`

@@ -31,12 +31,12 @@
 
 ## 介绍
 
-这是一个可以私有化部署的`ChatGpt`网页，使用`OpenAI`的官方API接入`gpt-3.5-turbo`或`gpt-4`模型来实现接近`ChatGPT Plus`的对话效果。
+这是一个可以私有化部署的`ChatGpt`网页，使用`OpenAI`的官方API接入`gpt-3.5`或`gpt-4`模型来实现接近`ChatGPT Plus`的对话效果。
 源代码Fork和修改于[Chanzhaoyu/chatgpt-web](https://github.com/Chanzhaoyu/chatgpt-web/)
 
 与OpenAI官方提供`ChatGPT Plus`对比，`ChatGPT Web`有以下优势：
 
-1. **省钱(仅限`gpt-3.5-turbo`)**。
+1. **省钱(仅限`gpt-3.5`)**。
   - 按照日常用量，你可以用1折左右的价格，体验与`ChatGPT Plus`几乎相同的对话服务。
   - 语音识别可以在本地离线完成，完全免费。
 2. **0门槛使用**。你可以将自建的`ChatGPT Web`
@@ -130,7 +130,7 @@ python main.py --openai_api_key="$OPENAI_API_KEY"
 除了`openai_api_key`这个必填的参数之外，还有以下可选参数可用：
 
 - `openai_timeout_ms` 访问OpenAI的超时时间(毫秒)，默认值为 '100000'
-- `api_model` 默认值为 gpt-3.5-turbo-0301 也可以使用很贵的 gpt-4
+- `api_model` 默认值为 gpt-3.5-turbo 也可以使用很贵的 gpt-4
 - `socks_proxy` 代理，默认值为空字符串，格式示例: `http://127.0.0.1:10808`
 - `use_local_whisper` 设置为`true`可以使用离线模型来完成语音识别，如果设置为`false`就会使用OpenAI的API进行语音识别，默认值为: `true`
 - `host` HOST，默认值为 0.0.0.0
@@ -188,8 +188,8 @@ python main.py --openai_api_key="$OPENAI_API_KEY" --openai_timeout_ms="$OPENAI_T
         OPENAI_API_KEY: your_openai_api_key
         # 访问OpenAI的超时时间(毫秒)，可选，默认值为 '100000'
         OPENAI_TIMEOUT_MS: '100000'
-        # 可选，默认值为 gpt-3.5-turbo-0301
-        API_MODEL: gpt-3.5-turbo-0301
+        # 可选，默认值为 gpt-3.5-turbo
+        API_MODEL: gpt-3.5-turbo
         # Socks代理，可选，格式为 http://127.0.0.1:10808
         SOCKS_PROXY: ''
         # 可选，将USE_LOCAL_WHISPER设置为`true`可以使用离线模型来完成语音识别，如果设置为`false`就会使用OpenAI的API进行语音识别，默认值为: `true`
@@ -268,8 +268,8 @@ python main.py --openai_api_key="$OPENAI_API_KEY" --openai_timeout_ms="$OPENAI_T
         OPENAI_API_KEY: your_openai_api_key
         # 访问OpenAI的超时时间(毫秒)，可选，默认值为 '100000'
         OPENAI_TIMEOUT_MS: '100000'
-        # 可选，默认值为 gpt-3.5-turbo-0301
-        API_MODEL: gpt-3.5-turbo-0301
+        # 可选，默认值为 gpt-3.5-turbo
+        API_MODEL: gpt-3.5-turbo
         # Socks代理，可选，格式为 http://127.0.0.1:10808
         SOCKS_PROXY: ''
         # 可选，将USE_LOCAL_WHISPER设置为`true`可以使用离线模型来完成语音识别，如果设置为`false`就会使用OpenAI的API进行语音识别，默认值为: `true`
